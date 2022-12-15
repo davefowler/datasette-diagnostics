@@ -55,7 +55,7 @@ async def render_diagnostics(datasette, columns, rows, sql, table, request, data
     for cname, ctype in zip(columns, column_types):
         d = []
         for query, label in QUERIES_FOR_FIELD_TYPE.get(ctype, ()):
-            d.append((label.format(cname), result.rows[0][i]))
+            d.append((label.format('').strip(), result.rows[0][i]))
             i += 1
         diagnostics[cname] = d
  

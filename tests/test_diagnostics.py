@@ -64,7 +64,7 @@ async def test_example_table_json(datasette):
     )
     assert response.status_code == 200
     assert len(response.json()) == 50
- 
+    assert list(dict(response.json()[0]).keys()) == ['id', 'text_column', 'real_column', 'integer_column', 'blob_column']
 
 
 @pytest.mark.asyncio
