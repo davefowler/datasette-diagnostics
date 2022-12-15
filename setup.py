@@ -14,7 +14,7 @@ def get_long_description():
 
 setup(
     name="datasette-diagnostics",
-    description="Run diagnostics on query results",
+    description="Run diagnostics on query results plugin for Datasette",
     long_description=get_long_description(),
     long_description_content_type="text/markdown",
     author="Dave Fowler",

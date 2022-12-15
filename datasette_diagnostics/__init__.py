@@ -7,18 +7,13 @@ QUERIES_FOR_FIELD_TYPE = {
     ("COUNT({})", "Count {}", ),
   ],
   int: [
+    ("COUNT({})", "Count {}", ),
+    ("COUNT(DISTINCT {})", "Distinct {}", ),
     ("SUM({})", "Sum {}", ),
     ("MIN({})", "Min {}", ),
     ("MAX({})", "Max {}", ),
     ("AVG({})", "Avg {}", ),
-    ("COUNT({})", "Count {}", ),
-    ("COUNT(DISTINCT {})", "Distinct {}", ),
   ], 
-  "datetime": [ # TODO - # of unique years, months, etc
-    ("MIN({})", "Min {}", ),
-    ("MAX({})", "Max {}", ),
-    ("AVG({})", "Avg {}", ),
-  ],
   bytes: [
     ("COUNT({})", "Count {}", ),
     ("COUNT(DISTINCT {})", "Distinct {}", ),
@@ -47,11 +42,7 @@ async def render_diagnostics(datasette, columns, rows, sql, table, request, data
             selects.append(query.format(name) + " as \"" + label.format(name) + "\"")
 
     selects = ', '.join(selects)
-    print("selects", selects)
     query = "SELECT {} FROM ({});".format(selects, sql)
-    print ("query is", query)
-
-
     db = datasette.get_database(database)
     result = await db.execute(query);
 
@@ -59,15 +50,15 @@ async def render_diagnostics(datasette, columns, rows, sql, table, request, data
     diagnostics = {}
     i = 0;
     for cname, ctype in zip(columns, column_types):
-        d = {}
+        d = []
         for query, label in QUERIES_FOR_FIELD_TYPE[ctype]:
-            d[label.format(cname)] = result.rows[0][i]
+            d.append((label.format(cname), result.rows[0][i]))
             i += 1
         diagnostics[cname] = d
  
     return Response.html(
         await datasette.render_template(
-            "diagnostics.html",{'diagnostics': diagnostics}, request=request, 
+            "diagnostics.html", {'diagnostics': diagnostics}, request=request, 
         )
     )
 

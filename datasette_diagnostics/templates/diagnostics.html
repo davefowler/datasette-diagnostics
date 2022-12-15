@@ -7,6 +7,21 @@
 {% block content %}
 <h1>Custom Template! {{ filename }}</h1>
 
-<pre>{{ diagnostics }}</pre>
+<table>
+    <tr>
+    {% for col, diag in diagnostics.items() %}
+        <th>{{ col }}</th> 
+    {% endfor %}
+    </tr>
+    <tr>
+    {% for col, diag in diagnostics.items() %}
+        <td>
+        {% for name, value in diag %}
+        {{ name }}: {{ value }}<br>
+        {% endfor %}
+        </td>
+    {% endfor %}
+    </tr>
+</table>
 
 {% endblock %}
