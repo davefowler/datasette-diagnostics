@@ -58,7 +58,7 @@ def datasette(tmp_path_factory):
 
 
 @pytest.mark.asyncio
-async def test_example_table_json(datasette):
+async def test_everytype_table_json(datasette):
     response = await datasette.client.get(
         "/test/everytype.json?_shape=array"
     )
@@ -68,7 +68,31 @@ async def test_example_table_json(datasette):
 
 
 @pytest.mark.asyncio
-async def test_example_table_html(datasette):
+async def test_everytype_diagnostics_html(datasette):
+    assert response.status_code == 200
+    response = await datasette.client.get("/test/everytype.diagnostics")
+    assert ">Diagnostics</h1>" in response.text
+    assert response.text.count("<tr>") == 3
+    assert response.text.count("<th>") == 5  # number of cols
+    assert response.text.count("<td>") == 10
+    assert response.text.count("Count: 50") == 5 # each col should have a count of 50
+    assert response.text.count(": ") == 26 # number of diagnostics
+
+
+@pytest.mark.asyncio
+async def test_custom_query(datasette):
+    assert response.status_code == 200
+    # simple custom query pulling 4 columns of a few different types
+    response = await datasette.client.get("/test.diagnostics?sql=select+1%2C+%27this%27%2C+null%2C+2.5+from+everytype")
+    assert ">Diagnostics</h1>" in response.text
+    assert response.text.count("<tr>") == 3
+    assert response.text.count("<th>") == 4  # number of cols
+    assert response.text.count("<td>") == 8 
+    assert response.text.count(": ") == 16 # number of diagnostics
+
+
+@pytest.mark.asyncio
+async def test_everytpe_table_html(datasette):
     response = await datasette.client.get("/test/everytype")
     assert ">A column for every type</h1>" in response.text
 
