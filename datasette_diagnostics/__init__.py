@@ -33,6 +33,8 @@ async def render_diagnostics(datasette, columns, rows, sql, table, request, data
         raise DatasetteError("Insufficient data for running diagnostics.")
 
     db = datasette.get_database(database)
+    # Note - it's faster and potentially just as reliable to get column types from the first row:
+    # column_types = [type(col) for col in rows[0]]  
     column_types_query = "SELECT {} FROM ({});".format(', '.join('typeof({})'.format(col) for col in columns), sql)
     result = await db.execute(column_types_query);
     column_types = result.first()
@@ -52,7 +54,7 @@ async def render_diagnostics(datasette, columns, rows, sql, table, request, data
     i = 0;
     for cname, ctype in zip(columns, column_types):
         d = []
-        for query, label in QUERIES_FOR_FIELD_TYPE[ctype]:
+        for query, label in QUERIES_FOR_FIELD_TYPE.get(ctype, ()):
             d.append((label.format(cname), result.rows[0][i]))
             i += 1
         diagnostics[cname] = d
