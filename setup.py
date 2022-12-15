@@ -34,8 +34,10 @@ setup(
     entry_points={"datasette": ["diagnostics = datasette_diagnostics"]},
     install_requires=["datasette"],
     extras_require={"test": ["pytest", "pytest-asyncio"]},
+    tests_require=["datasette-my-plugin[test]"],
     package_data={
         "datasette_diagnostics": ["templates/*"]
     },
     python_requires=">=3.7",
+
 )

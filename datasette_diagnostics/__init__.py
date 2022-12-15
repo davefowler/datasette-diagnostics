@@ -2,11 +2,9 @@ from datasette import hookimpl
 from datasette.utils.asgi import Response
 
 QUERIES_FOR_FIELD_TYPE = {
-  bool: [
-    ("SUM({})", "# True {}", ),
-    ("COUNT({})", "Count {}", ),
+  "null": [
   ],
-  int: [
+  "integer": [
     ("COUNT({})", "Count {}", ),
     ("COUNT(DISTINCT {})", "Distinct {}", ),
     ("SUM({})", "Sum {}", ),
@@ -14,15 +12,15 @@ QUERIES_FOR_FIELD_TYPE = {
     ("MAX({})", "Max {}", ),
     ("AVG({})", "Avg {}", ),
   ], 
-  bytes: [
+  "blob": [
     ("COUNT({})", "Count {}", ),
     ("COUNT(DISTINCT {})", "Distinct {}", ),
     ("MAX(LENGTH({}))", "Max Length {}", ),
     ("MIN(LENGTH({}))", "Min Length {}", ),
   ],
 }
-QUERIES_FOR_FIELD_TYPE[float] = QUERIES_FOR_FIELD_TYPE[int]
-QUERIES_FOR_FIELD_TYPE[str] = QUERIES_FOR_FIELD_TYPE[bytes]
+QUERIES_FOR_FIELD_TYPE["real"] = QUERIES_FOR_FIELD_TYPE["integer"]
+QUERIES_FOR_FIELD_TYPE["text"] = QUERIES_FOR_FIELD_TYPE["blob"]
 
 
 def can_render_diagnostics(datasette, columns):
@@ -34,7 +32,11 @@ async def render_diagnostics(datasette, columns, rows, sql, table, request, data
         from datasette.views.base import DatasetteError
         raise DatasetteError("Insufficient data for running diagnostics.")
 
-    column_types = [type(col) for col in rows[0]]
+    db = datasette.get_database(database)
+    column_types_query = "SELECT {} FROM ({});".format(', '.join('typeof({})'.format(col) for col in columns), sql)
+    result = await db.execute(column_types_query);
+    column_types = result.first()
+    
     selects = []
     diagnostic_queries = zip(columns, [QUERIES_FOR_FIELD_TYPE[t] for t in column_types])
     for name, queries in diagnostic_queries:
@@ -43,7 +45,6 @@ async def render_diagnostics(datasette, columns, rows, sql, table, request, data
 
     selects = ', '.join(selects)
     query = "SELECT {} FROM ({});".format(selects, sql)
-    db = datasette.get_database(database)
     result = await db.execute(query);
 
     # package back up the results by column name
@@ -58,7 +59,7 @@ async def render_diagnostics(datasette, columns, rows, sql, table, request, data
  
     return Response.html(
         await datasette.render_template(
-            "diagnostics.html", {'diagnostics': diagnostics}, request=request, 
+            "diagnostics.html", {'diagnostics': diagnostics, 'column_types': column_types}, request=request, 
         )
     )
 

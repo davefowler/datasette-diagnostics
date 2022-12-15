@@ -14,6 +14,12 @@
     {% endfor %}
     </tr>
     <tr>
+        {% for type in column_types %}
+            <td>{{ type }}</td> 
+        {% endfor %}
+        </tr>
+    
+    <tr>
     {% for col, diag in diagnostics.items() %}
         <td>
         {% for name, value in diag %}
