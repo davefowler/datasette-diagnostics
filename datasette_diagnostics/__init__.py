@@ -69,7 +69,11 @@ async def render_diagnostics(datasette, columns, rows, sql, table, request, data
  
     return Response.html(
         await datasette.render_template(
-            "diagnostics.html", {'diagnostics': diagnostics, 'column_types': column_types}, request=request, 
+            "diagnostics.html", 
+            {'diagnostics': diagnostics, 
+            'column_types': column_types,
+            'sql': sql
+            }, request=request, 
         )
     )
 

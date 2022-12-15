@@ -5,7 +5,12 @@
 {% block body_class %}diagnostics{% endblock %}
 
 {% block content %}
-<h1>Custom Template! {{ filename }}</h1>
+<h1>Diagnostics</h1>
+
+<p>
+    The SQL command being analayzed here is<br>
+    <code>{{ sql }}</code>
+</p>
 
 <table>
     <tr>
