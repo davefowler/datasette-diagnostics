@@ -22,6 +22,13 @@ QUERIES_FOR_FIELD_TYPE = {
 QUERIES_FOR_FIELD_TYPE["real"] = QUERIES_FOR_FIELD_TYPE["integer"]
 QUERIES_FOR_FIELD_TYPE["text"] = QUERIES_FOR_FIELD_TYPE["blob"]
 
+TYPE_MAP = {
+    int: "integer",
+    None: "null",
+    str: "text",
+    float: "real",
+    bytes: "blob",
+}
 
 def can_render_diagnostics(datasette, columns):
     return True
@@ -33,11 +40,12 @@ async def render_diagnostics(datasette, columns, rows, sql, table, request, data
         raise DatasetteError("Insufficient data for running diagnostics.")
 
     db = datasette.get_database(database)
-    # Note - it's faster and potentially just as reliable to get column types from the first row:
-    # column_types = [type(col) for col in rows[0]]  
-    column_types_query = "SELECT {} FROM ({});".format(', '.join('typeof({})'.format(col) for col in columns), sql)
-    result = await db.execute(column_types_query);
-    column_types = result.first()
+    column_types = [TYPE_MAP.get(type(col), "null") for col in rows[0]]  
+    
+    # Alternative way to get the column types
+    #column_types_query = "SELECT {} FROM ({});".format(', '.join('typeof({})'.format(col) for col in columns), sql)
+    #result = await db.execute(column_types_query);
+    #column_types = result.first()
     
     selects = []
     diagnostic_queries = zip(columns, [QUERIES_FOR_FIELD_TYPE[t] for t in column_types])

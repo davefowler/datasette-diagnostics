@@ -19,7 +19,7 @@ Install this plugin in the same environment as Datasette.
 
 When you view a table or run a query you'll see a "diagnostics" option in the export ("This data as") menu
 
-![Diagnostics Datasette view](https://p38.f2.n0.cdn.getcloudapp.com/items/JruygbWq/2b1c9dd9-a342-48b3-ad5f-42533371b4ff.png?source=viewer&v=8ff4ea38a9209c681e3465d87457dafa)
+![Diagnostics Datasette view](https://p38.f2.n0.cdn.getcloudapp.com/items/d5uypvkB/d1a41287-7b52-4825-a33d-f2f074274600.jpg?source=viewer&v=1e43b1d2fc73306b021588c208dfe568)
 
 ## Development
 
