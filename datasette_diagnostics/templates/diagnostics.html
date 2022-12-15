@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}{{ filename }}{% endblock %}
+
+{% block body_class %}diagnostics{% endblock %}
+
+{% block content %}
+<h1>Custom Template! {{ filename }}</h1>
+
+<pre>{{ diagnostics }}</pre>
+
+{% endblock %}
